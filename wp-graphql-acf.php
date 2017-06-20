@@ -6,7 +6,7 @@
  * Author URI: https://tonimain.com
  */
 
-namespace WPGraphQL\Extensions\ACF;
+namespace WPGraphQL\Extensions\Acf;
 
 /**
  * Get a collection of registered post types and taxonomies
@@ -63,12 +63,12 @@ function add_meta_fields( $fields, $object_type ) {
 						$acf_field = get_field_object( $field_args['key']);
 						return $acf_field['value'];
 					}
-					if ( 'term' === $object_type || in_array( $object_type, get_taxonomies(), true ) ) {
-						return get_term_meta( $object->term_id, $key, $field_args['single'] );
-					}
-					if ( 'user' === $object_type ) {
-						return get_user_meta( $object->ID, $key, $field_args['single'] );
-					}
+//					if ( 'term' === $object_type || in_array( $object_type, get_taxonomies(), true ) ) {
+//						return get_term_meta( $object->term_id, $key, $field_args['single'] );
+//					}
+//					if ( 'user' === $object_type ) {
+//						return get_user_meta( $object->ID, $key, $field_args['single'] );
+//					}
 					return '';
 				},
 			);
@@ -90,26 +90,26 @@ function resolve_meta_type( $type, $single = true ) {
 		return $type;
 	}
 
-	$imagetype = new ObjectType([
-        'name' => 'Image',
-        'description' => 'Image from acf',
-        'fields' => [
-            'id' => [
-                'type' => Types::non_null(Types::id()),
-                'description' => __( 'The globally unique identifier for the user', 'wp-graphql' ),
-                'resolve' => function () {
-	                return '12';
-                }
-            ],
-            'image_name' => [
-                'type' => Types::string(),
-                'description' => __( 'Image field name from image', 'wp-graphql' ),
-                'resolve' => function() {
-	                return 'Im the awesome image name';
-                }
-            ]
-        ],
-    ]);
+//	$imagetype = new ObjectType([
+//        'name' => 'Image',
+//        'description' => 'Image from acf',
+//        'fields' => [
+//            'id' => [
+//                'type' => Types::non_null(Types::id()),
+//                'description' => __( 'The globally unique identifier for the user', 'wp-graphql' ),
+//                'resolve' => function () {
+//	                return '12';
+//                }
+//            ],
+//            'image_name' => [
+//                'type' => Types::string(),
+//                'description' => __( 'Image field name from image', 'wp-graphql' ),
+//                'resolve' => function() {
+//	                return 'Im the awesome image name';
+//                }
+//            ]
+//        ],
+//    ]);
 
 	switch ( $type ) {
 		case 'integer':
@@ -125,7 +125,7 @@ function resolve_meta_type( $type, $single = true ) {
 			$type = \WPGraphQL\Types::boolean();
 			break;
 		default:
-			$type = apply_filters( "graphql_{$type}_type", \WPGraphQL\Types::string(), $type );
+			$type = apply_filters( "graphql_{$type}_type", \WPGraphQL\Extensions\Acf\Types::acf(), $type );
 	}
 
 	return $single ? $type : \WPGraphQL\Types::list_of( $type );
