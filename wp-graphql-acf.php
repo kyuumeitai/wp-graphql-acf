@@ -133,15 +133,6 @@ if ( ! class_exists( '\WPGraphQL\Extensions\ACF' ) ) :
 		 */
 		private function actions() {
 
-//			add_action( 'admin_init', function() {
-//
-//				var_dump( acf_get_field_types() );
-//				var_dump( acf_get_field_group( 2375 ) );
-//				var_dump( acf_get_fields_by_id( 2375 ) );
-//				die();
-//
-//			}, 500 );
-
 		}
 
 		/**
@@ -162,4 +153,4 @@ function init() {
 	return ACF::instance();
 }
 
-add_action( 'graphql_init', '\WPGraphQL\Extensions\init', 500 );
+add_action( 'graphql_init', '\WPGraphQL\Extensions\init' );
