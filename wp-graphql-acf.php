@@ -1,132 +1,156 @@
 <?php
 /**
- * Plugin Name: WP GraphQL ACF
- * Description: Adds registered meta data to objects by leveraging the existing register_meta() information.
- * Author: Toni Main
- * Author URI: https://tonimain.com
- */
-
-namespace WPGraphQL\Extensions\Acf;
-
-/**
- * Get a collection of registered post types and taxonomies
- * then run them through the GraphQL fields filter.
- */
-use GraphQL\Language\AST\Type;
-use GraphQL\Type\Definition\ObjectType;
-use WPGraphQL\Type\WPObjectType;
-use WPGraphQL\Types;
-
-add_action( 'graphql_init', function() {
-
-	$post_types = get_post_types();
-	$taxonomies = get_taxonomies();
-	$all_types  = array_merge(
-		$post_types,
-		$taxonomies,
-		array( 'user' )
-	);
-
-	foreach ( $all_types as $type ) {
-		add_filter( "graphql_{$type}_fields", function ( $fields ) use ( $type ) {
-			return add_meta_fields( $fields, $type );
-		} );
-	}
-
-} );
-
-/**
- * Adds the meta fields for this $object_type registered using
- * register_meta().
+ * Plugin Name:     WPGraphQL ACF
+ * Plugin URI:      https://github.com/tonimain/wp-graphql-acf
+ * Description:     Adds Advanced Custom Fields to the WPGraphQL Schema
+ * Author:          Toni Main
+ * Author URI:      https://tonimain.com
+ * Text Domain:     wp-graphql-acf
+ * Domain Path:     /languages
+ * Version:         0.1.0
  *
- * @param array $fields
- * @param string $object_type
- * @return array
- * @throws Exception If a meta key is the same as a default key warn the dev.
+ * @package         WPGraphQL_ACF
  */
 
-function add_meta_fields( $fields, $object_type ) {
-	$meta_keys = get_field_objects(false);
+namespace WPGraphQL\Extensions;
 
-	if ( ! empty( $meta_keys ) ) {
-		foreach ( $meta_keys as $key => $field_args ) {
+// Exit if accessed directly.
+use WPGraphQL\Extensions\ACF\Test;
 
-			if ( isset( $fields[ $key ] ) ) {
-				throw new \Exception( sprintf( 'Post meta key "%s" is a reserved word.', $key ) );
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+if ( ! class_exists( '\WPGraphQL\Extensions\ACF' ) ) :
+
+	final class ACF {
+
+		/**
+		 * Stores the instance of the WPGraphQL\Extensions\ACF class
+		 *
+		 * @var ACF The one true WPGraphQL\Extensions\ACF
+		 * @access private
+		 */
+		private static $instance;
+
+		public static function instance() {
+
+			if ( ! isset( self::$instance ) && ! ( self::$instance instanceof ACF ) ) {
+				self::$instance = new ACF;
+				self::$instance->setup_constants();
+				self::$instance->includes();
+				self::$instance->actions();
+				self::$instance->filters();
 			}
 
-			$fields[ $key ] = array(
-				'type'        => resolve_meta_type( $field_args['type'] ),
-				'description' => $field_args['name'],
-				'resolve'     => function( $object ) use ( $object_type, $key, $field_args ) {
-					if ( 'post' === $object_type || in_array( $object_type, get_post_types(), true ) ) {
-						$acf_field = get_field_object( $field_args['key']);
-						return $acf_field['value'];
-					}
-//					if ( 'term' === $object_type || in_array( $object_type, get_taxonomies(), true ) ) {
-//						return get_term_meta( $object->term_id, $key, $field_args['single'] );
-//					}
-//					if ( 'user' === $object_type ) {
-//						return get_user_meta( $object->ID, $key, $field_args['single'] );
-//					}
-					return '';
-				},
-			);
+			/**
+			 * Fire off init action
+			 *
+			 * @param ACF $instance The instance of the WPGraphQL\Extensions\ACF class
+			 */
+			do_action( 'graphql_acf_init', self::$instance );
+
+			/**
+			 * Return the WPGraphQL Instance
+			 */
+			return self::$instance;
 		}
+
+		/**
+		 * Throw error on object clone.
+		 * The whole idea of the singleton design pattern is that there is a single object
+		 * therefore, we don't want the object to be cloned.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function __clone() {
+
+			// Cloning instances of the class is forbidden.
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'The \WPGraphQL\Extensions\ACF class should not be cloned.', 'wp-graphql-acf' ), '0.0.1' );
+
+		}
+
+		/**
+		 * Disable unserializing of the class.
+		 *
+		 * @access protected
+		 * @return void
+		 */
+		public function __wakeup() {
+
+			// De-serializing instances of the class is forbidden.
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'De-serializing instances of the \WPGraphQL\Extensions\ACF class is not allowed', 'wp-graphql-acf' ), '0.0.1' );
+
+		}
+
+		/**
+		 * Setup plugin constants.
+		 *
+		 * @access private
+		 * @return void
+		 */
+		private function setup_constants() {
+
+			// Plugin version.
+			if ( ! defined( 'WPGRAPHQL_ACF_VERSION' ) ) {
+				define( 'WPGRAPHQL_VERSION', '0.1.0' );
+			}
+
+			// Plugin Folder Path.
+			if ( ! defined( 'WPGRAPHQL_ACF_PLUGIN_DIR' ) ) {
+				define( 'WPGRAPHQL_ACF_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+			}
+
+			// Plugin Folder URL.
+			if ( ! defined( 'WPGRAPHQL_ACF_PLUGIN_URL' ) ) {
+				define( 'WPGRAPHQL_ACF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+			}
+
+			// Plugin Root File.
+			if ( ! defined( 'WPGRAPHQL_ACF_PLUGIN_FILE' ) ) {
+				define( 'WPGRAPHQL_ACF_PLUGIN_FILE', __FILE__ );
+			}
+
+		}
+
+		/**
+		 * Include required files.
+		 * Uses composer's autoload
+		 *
+		 * @access private
+		 * @return void
+		 */
+		private function includes() {
+
+			// Autoload Required Classes
+			require_once( WPGRAPHQL_ACF_PLUGIN_DIR . 'vendor/autoload.php' );
+
+		}
+
+		/**
+		 * Sets up actions to run at certain spots throughout WordPress and the WPGraphQL execution cycle
+		 */
+		private function actions() {
+
+		}
+
+		/**
+		 * Setup filters
+		 */
+		private function filters() {
+
+			add_filter( 'graphql_root_queries', [ '\WPGraphQL\Extensions\ACF\Filters', 'acf_root_query_field_groups' ], 10, 1 );
+			add_filter( 'acf/get_field_types', [ '\WPGraphQL\Extensions\ACF\Filters', 'acf_field_types' ], 100 );
+			add_filter( 'acf/get_fields', ['\WPGraphQL\Extensions\ACF\Filters', 'acf_get_fields' ], 100 );
+		}
+
 	}
 
-	return $fields;
+endif;
+
+function init() {
+	return ACF::instance();
 }
 
-/**
- * Resolves REST API types to meta data types.
- *
- * @param \GraphQL\Type\Definition\AbstractType $type
- * @param bool $single
- * @return mixed
- */
-function resolve_meta_type( $type, $single = true ) {
-	if ( $type instanceof \GraphQL\Type\Definition\AbstractType ) {
-		return $type;
-	}
-
-//	$imagetype = new ObjectType([
-//        'name' => 'Image',
-//        'description' => 'Image from acf',
-//        'fields' => [
-//            'id' => [
-//                'type' => Types::non_null(Types::id()),
-//                'description' => __( 'The globally unique identifier for the user', 'wp-graphql' ),
-//                'resolve' => function () {
-//	                return '12';
-//                }
-//            ],
-//            'image_name' => [
-//                'type' => Types::string(),
-//                'description' => __( 'Image field name from image', 'wp-graphql' ),
-//                'resolve' => function() {
-//	                return 'Im the awesome image name';
-//                }
-//            ]
-//        ],
-//    ]);
-
-	switch ( $type ) {
-		case 'integer':
-			$type = \WPGraphQL\Types::int();
-			break;
-        case 'image':
-            $type = \WPGraphQL\Types::list_of($imagetype);
-
-		case 'number':
-			$type = \WPGraphQL\Types::float();
-			break;
-		case 'boolean':
-			$type = \WPGraphQL\Types::boolean();
-			break;
-		default:
-			$type = apply_filters( "graphql_{$type}_type", \WPGraphQL\Extensions\Acf\Types::acf(), $type );
-	}
-
-	return $single ? $type : \WPGraphQL\Types::list_of( $type );
-}
+add_action( 'graphql_init', '\WPGraphQL\Extensions\init' );

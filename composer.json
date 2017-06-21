@@ -1,13 +1,25 @@
 {
-    "name": "tonimain/wp-graphql-meta",
-    "description": "Advanced Custom Fields data helper for wp-graphql",
-    "type": "library",
-    "license": "GPLv3",
-    "authors": [
-        {
-            "name": "Toni Main",
-            "email": "me@tonimain.com"
-        }
-    ],
-    "require": {}
+  "name": "tonimain/wp-graphql-acf",
+  "description": "Advanced Custom Fields bindings for wp-graphql",
+  "type": "library",
+  "license": "GPLv3",
+  "authors": [
+    {
+      "name": "Toni Main",
+      "email": "me@tonimain.com"
+    }
+  ],
+  "require-dev": {
+  },
+  "config": {
+    "optimize-autoloader": true
+  },
+  "autoload": {
+    "psr-4": {
+      "WPGraphQL\\Extensions\\ACF\\": "src/"
+    },
+    "classmap": [
+      "src/"
+    ]
+  }
 }
