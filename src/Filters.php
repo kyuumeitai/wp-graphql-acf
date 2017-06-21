@@ -1,4 +1,5 @@
 <?php
+
 namespace WPGraphQL\Extensions\ACF;
 
 use GraphQL\Type\Definition\ResolveInfo;
@@ -12,6 +13,7 @@ class Filters {
 		$graphql_label = ucwords( $graphql_label );
 		$graphql_label = str_ireplace( ' ', '', $graphql_label );
 		$graphql_label = lcfirst( $graphql_label );
+
 		return $graphql_label;
 
 	}
@@ -19,9 +21,9 @@ class Filters {
 	public static function acf_root_query_field_groups( $fields ) {
 
 		$fields['fieldGroups'] = [
-			'type' => \WPGraphQL\Types::list_of( Types::field_group_type() ),
+			'type'        => \WPGraphQL\Types::list_of( Types::field_group_type() ),
 			'description' => __( 'Field Groups defined by Advanced Custom Fields', 'wp-graphql-acf' ),
-			'resolve' => function( $root, array $args, AppContext $context, ResolveInfo $info ) {
+			'resolve'     => function ( $root, array $args, AppContext $context, ResolveInfo $info ) {
 				return acf_get_field_groups();
 			},
 		];
@@ -29,7 +31,6 @@ class Filters {
 		return $fields;
 
 	}
-
 
 
 	public static function acf_get_fields( $fields ) {
@@ -40,7 +41,7 @@ class Filters {
 
 		foreach ( $fields as $key => $field ) {
 
-			$graphql_label = self::_graphql_label( $field['type'] );
+			$graphql_label                   = self::_graphql_label( $field['type'] );
 			$fields[ $key ]['graphql_label'] = $graphql_label . 'Field';
 
 		}
@@ -56,7 +57,7 @@ class Filters {
 
 		foreach ( $types as $type_key => $type ) {
 
-			$graphql_label = self::_graphql_label( $type['name'] );
+			$graphql_label                       = self::_graphql_label( $type['name'] );
 			$types[ $type_key ]['graphql_label'] = $graphql_label . 'Field';
 
 		}
