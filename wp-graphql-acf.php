@@ -3,8 +3,8 @@
  * Plugin Name:     WPGraphQL ACF
  * Plugin URI:      https://github.com/tonimain/wp-graphql-acf
  * Description:     Adds Advanced Custom Fields to the WPGraphQL Schema
- * Author:          Toni Main
- * Author URI:      https://tonimain.com
+ * Author:          WPGraphQL, Toni Main, Jason Bahl
+ * Author URI:      https://www.wpgraphql.com
  * Text Domain:     wp-graphql-acf
  * Domain Path:     /languages
  * Version:         0.1.0
@@ -13,9 +13,6 @@
  */
 
 namespace WPGraphQL\Extensions;
-
-// Exit if accessed directly.
-use WPGraphQL\Extensions\ACF\Test;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -133,6 +130,11 @@ if ( ! class_exists( '\WPGraphQL\Extensions\ACF' ) ) :
 		 */
 		private function actions() {
 
+			/**
+			 * Add acf fields to the types registered to GraphQL
+			 */
+			add_action( 'graphql_generate_schema', [ '\WPGraphQL\Extensions\ACF\Actions', 'acf_add_fields_to_types' ] );
+
 		}
 
 		/**
@@ -142,7 +144,8 @@ if ( ! class_exists( '\WPGraphQL\Extensions\ACF' ) ) :
 
 			add_filter( 'graphql_root_queries', [ '\WPGraphQL\Extensions\ACF\Filters', 'acf_root_query_field_groups' ], 10, 1 );
 			add_filter( 'acf/get_field_types', [ '\WPGraphQL\Extensions\ACF\Filters', 'acf_field_types' ], 100 );
-			add_filter( 'acf/get_fields', ['\WPGraphQL\Extensions\ACF\Filters', 'acf_get_fields' ], 100 );
+			add_filter( 'acf/get_fields', [ '\WPGraphQL\Extensions\ACF\Filters', 'acf_get_fields' ], 100 );
+
 		}
 
 	}
