@@ -151,8 +151,16 @@ class Actions {
 						'type'        => ACFTypes::field_type( $type ),
 						// Translators: The placeholder is the type of object (post_type, taxonomy, etc) being filtered
 						'description' => sprintf( __( 'The %1$s field', 'wp-graphql-acf' ), $acf_field['label'] ),
-						'resolve'     => function( \WP_Post $post ) use ( $acf_field, $type ) {
-							$acf_field['object_id'] = $post->ID;
+						'resolve'     => function( $resolving_object ) use ( $acf_field, $type ) {
+
+							$object_id = '';
+							if ( $resolving_object instanceof \WP_Post ) {
+								$object_id = $resolving_object->ID;
+							} elseif ( $resolving_object instanceof \WP_Term ) {
+								$object_id = $resolving_object->taxonomy . '_' . $resolving_object->term_id;
+							}
+
+							$acf_field['object_id'] = $object_id;
 							return $acf_field;
 						},
 					];
