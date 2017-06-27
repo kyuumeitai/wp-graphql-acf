@@ -20,7 +20,7 @@ class FieldType extends WPObjectType {
 		 * Set the name of the field
 		 */
 		self::$type = $type;
-		self::$type_name = ! empty( self::$type['graphql_label'] ) ? self::$type['graphql_label'] : null;
+		self::$type_name = ! empty( self::$type['graphql_label'] ) ? 'acf' . ucwords( self::$type['graphql_label'] ) . 'Field' : null;
 
 		/**
 		 * Merge the fields passed through the config with the default fields
@@ -77,9 +77,12 @@ class FieldType extends WPObjectType {
 					'prefix' => [
 						'type' => Types::string(),
 					],
-//					'value' => [
-//						'type' => '',
-//					],
+					'value' => [
+						'type' => Types::string(),
+						'resolve' => function( array $field ) {
+							return get_field( $field['key'], $field['object_id'], true );
+						},
+					],
 //					'order' => [],
 					'required' => [
 						'type' => Types::boolean(),
