@@ -1,5 +1,5 @@
 {
-  "name": "tonimain/wp-graphql-acf",
+  "name": "wp-graphql/wp-graphql-acf",
   "description": "Advanced Custom Fields bindings for wp-graphql",
   "type": "wordpress-plugin",
   "license": "GPLv3",
