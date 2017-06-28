@@ -2,6 +2,8 @@
 
 namespace WPGraphQL\Extensions\ACF\Type\ACFCheckboxFieldType;
 
+use WPGraphQL\Types;
+
 class ACFCheckboxFieldType {
 	private static $fields;
 
@@ -30,27 +32,7 @@ class ACFCheckboxFieldType {
 					'resolve' => function ( array $field ) {
 						return get_field( $field['key'], $field['object_id'], true );
 					},
-				],
-//					'order' => [],
-				'required' => [
-					'type' => Types::boolean(),
-				],
-				'key'      => [
-					'type' => Types::string(),
-				],
-				'class'    => [
-					'type' => Types::string(),
-				],
-				// @todo: Add conditional logic
-				'group'    => [
-					'type'        => ACFTypes::field_group_type(),
-					'description' => __( 'The field group this field is part of', 'wp-graphql-acf' ),
-					'resolve'     => function ( array $field ) {
-						$field_group = acf_get_field_group( $field['parent'] );
-
-						return ! empty( $field_group ) ? $field_group : null;
-					},
-				],
+				]
 			];
 
 			return $fields;

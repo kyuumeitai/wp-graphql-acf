@@ -82,7 +82,7 @@ class Filters {
 	public function graphql_acfCheckboxField_fields( $fields ) {
 
 		$fields['choices'] = [
-			'type'        => Types::string(),
+			'type'        => \WPGraphQL\Types::string(),
 			'description' => __( 'The choices the field can choose from', 'wp-graphql-acf' ),
 			'resolve'     => function ( $fields ) {
 				$field = "value for choice";
