@@ -145,6 +145,7 @@ if ( ! class_exists( '\WPGraphQL\Extensions\ACF' ) ) :
 			add_filter( 'graphql_root_queries', [ '\WPGraphQL\Extensions\ACF\Filters', 'acf_root_query_field_groups' ], 10, 1 );
 			add_filter( 'acf/get_field_types', [ '\WPGraphQL\Extensions\ACF\Filters', 'acf_field_types' ], 100 );
 			add_filter( 'acf/get_fields', [ '\WPGraphQL\Extensions\ACF\Filters', 'acf_get_fields' ], 100 );
+			add_filter( 'graphql_acfCheckboxField_fields', ['\WPGraphQL\Extensions\ACF\Type\ACFCheckboxFieldType\ACFCheckboxFieldType', 'fields']);
 
 		}
 
