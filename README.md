@@ -1,6 +1,8 @@
 WP GraphQL ACF
 ===============
 
+## NOTE: This plugin is in early stages and is not quite ready for use.
+
 This plugin is an add-on for the awesome [WP GraphQL][wp-graphql]
 
 It builds on top of WP GraphQL. Any
