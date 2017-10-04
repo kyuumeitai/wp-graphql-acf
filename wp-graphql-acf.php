@@ -153,6 +153,17 @@ if ( ! class_exists( '\WPGraphQL\Extensions\ACF' ) ) :
 endif;
 
 function init() {
+    if(!class_exists('acf')) {
+        add_action( 'admin_notices', function() {
+            ?>
+            <div class="error notice">
+                <p><?php _e( 'Advanced custom fields must be active for wp-graphql-acf to work', 'wp-graphiql-acf' ); ?></p>
+            </div>
+            <?php
+        });
+        return false;
+    }
+
 	return ACF::instance();
 }
 
