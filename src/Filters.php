@@ -62,7 +62,7 @@ class Filters {
 	 *
 	 * @return array
 	 */
-	public function acf_field_types( $types ) {
+	public static function acf_field_types( $types ) {
 
 		if ( empty( $types ) || ! is_array( $types ) ) {
 			return $types;
