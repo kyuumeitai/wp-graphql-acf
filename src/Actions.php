@@ -48,7 +48,11 @@ class Actions {
 						 * Setup the fields for each type, based on the param that's setting them up
 						 */
 						switch ( $location[0]['param'] ) {
-
+							case 'page':
+							case 'page_type':
+							case 'post_template':
+								self::post_object_fields( array(['operator'=>'==', 'value'=>'page']), $field_group );
+								break;
 							case 'post_type':
 								self::post_object_fields( $location, $field_group );
 								break;

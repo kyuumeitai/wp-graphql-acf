@@ -32,6 +32,10 @@ class Filters {
 
 	}
 
+	public static function acf_get_flexible_content_value( $value, $post_id, $field ) {
+		return ACFUtils::_transform_flexible_layout_value($value, $field['layouts']);
+	}
+
 	/**
 	 * Adds a "graphql_label" to each field when acf_get_fields() is called
 	 *
@@ -49,6 +53,15 @@ class Filters {
 
 			$graphql_label                   = ACFUtils::_graphql_label( $field['name'] );
 			$fields[ $key ]['graphql_label'] = $graphql_label . 'Field';
+
+			if( $fields[$key]['type'] == 'flexible_content' ) {
+				foreach($fields[$key]['layouts'] as $lkey => $layout ) {
+
+					$graphql_label                   				 = ACFUtils::_graphql_label( $layout['name'] );
+					$fields[$key]['layouts'][$lkey]['graphql_label'] = $graphql_label;
+
+				}
+			}
 
 		}
 
