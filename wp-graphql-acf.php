@@ -133,7 +133,7 @@ if ( ! class_exists( '\WPGraphQL\Extensions\ACF' ) ) :
 			/**
 			 * Add acf fields to the types registered to GraphQL
 			 */
-			add_action( 'graphql_generate_schema', [ '\WPGraphQL\Extensions\ACF\Actions', 'acf_add_fields_to_types' ] );
+			add_action( 'do_graphql_request', [ '\WPGraphQL\Extensions\ACF\Actions', 'acf_add_fields_to_types' ] );
 
 		}
 
