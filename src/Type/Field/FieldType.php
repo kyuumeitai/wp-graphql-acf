@@ -170,7 +170,9 @@ class FieldType extends WPObjectType {
 
 					/**
 					 * Gallery feild
-					 * Takes an array of mediaItems
+					 *
+					 * Does an initial check for value, if that isn't set then uses get_field_object to return
+					 * necessary fields
 					 */
 					case "gallery":
 					case "galleryField":
