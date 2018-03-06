@@ -78,7 +78,7 @@ class FieldType extends WPObjectType {
 					'prefix' => [
 						'type' => Types::string(),
 					],
-//					'order' => [],
+					// 'order' => [],
 					'required' => [
 						'type' => Types::boolean(),
 					],
@@ -201,11 +201,22 @@ class FieldType extends WPObjectType {
 						];
 						break;
 
+					/**
+					 * Default returns an string or number types, fields that will be returned via the default include all Basic fields:
+					 * - text
+					 * - text area
+					 * - number
+					 * - range
+					 * - email
+					 * - url
+					 * - password
+					 *
+					 * Current issues: 'Field Field' breaks.
+					 */
 					default:
 						$fields['value'] = [
 							'type' => Types::string(),
 							'resolve' => function( array $field ) {
-								// print_r($field);
 								if( isset($field['value']) ) {
 									return $field['value'];
 								}
