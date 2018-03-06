@@ -4,6 +4,7 @@ namespace WPGraphQL\Extensions\ACF;
 use WPGraphQL\Extensions\ACF\Type\Field\FieldType;
 use WPGraphQL\Extensions\ACF\Type\Field\RepeaterRow;
 use WPGraphQL\Extensions\ACF\Type\Field\Layout;
+use WPGraphQL\Extensions\ACF\Type\Field\Link;
 use WPGraphQL\Extensions\ACF\Type\FieldGroup\FieldGroupType;
 use WPGraphQL\Extensions\ACF\Type\LocationRule\LocationRuleType;
 use WPGraphQL\Extensions\ACF\Type\Union\FieldUnionType;
@@ -18,6 +19,7 @@ class Types {
 	private static $layout_union_type;
 	private static $repeater_row_type;
 	private static $layout;
+	private static $link;
 
 	public static function field_group_type() {
 		return self::$field_group_type ? : ( self::$field_group_type = new FieldGroupType() );
@@ -61,6 +63,10 @@ class Types {
 
 	public static function layout_union_type() {
 		return self::$layout_union_type ? : ( self::$layout_union_type = new LayoutUnionType() );
+	}
+
+	public static function link_type() {
+		return self::$link ? : ( self::$link = new Link() );
 	}
 
 	public static function repeater_row( $type ) {

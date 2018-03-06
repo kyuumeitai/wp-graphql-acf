@@ -201,6 +201,32 @@ class FieldType extends WPObjectType {
 						];
 						break;
 
+
+					case "link":
+					case "linkField":
+						$fields['value'] = [
+							'type' => ACFTypes::link_type(),
+							'resolve' => function( array $field ) {
+								// $to_json = json_encode($field);
+								// file_put_contents('link.json', $to_json);
+
+								if( isset($field['value']) ) {
+									return $field['value'];
+								}
+
+								if ($field['return_format'] == 'array') {
+									$post = json_encode(get_field( $field['key'], $field['object_id'], true ));
+									file_put_contents('link.json', $post);
+								} else {
+									return get_field( $field['key'], $field['object_id'], true );
+								}
+
+								return get_field( $field['key'], $field['object_id'], true );
+							},
+						];
+						break;
+
+
                     case "file":
                     case "fileField":
                         $fields['value'] = [
