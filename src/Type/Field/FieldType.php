@@ -201,7 +201,22 @@ class FieldType extends WPObjectType {
 						];
 						break;
 
-					/**
+                    case "file":
+                    case "fileField":
+                        $fields['value'] = [
+                            'type' => Types::post_object('attachment'),
+                            'resolve' => function( array $field ) {
+                                if( isset($field['value']) ) {
+                                    $field = $field['value'];
+                                } else {
+                                    $field = get_field( $field['key'], $field['object_id'], true );
+                                }
+                                return \WP_Post::get_instance( $field['ID'] );
+                            },
+                        ];
+                        break;
+
+                    /**
 					 * Default returns an string or number types, fields that will be returned via the default include all Basic fields:
 					 * - text
 					 * - text area
