@@ -167,6 +167,13 @@ class FieldType extends WPObjectType {
 					// 	];
 					// 	break;
 
+
+					/**
+					 * Gallery feild
+					 *
+					 * Does an initial check for value, if that isn't set then uses get_field_object to return
+					 * necessary fields
+					 */
 					case "gallery":
 					case "galleryField":
 						$fields['value'] = [
@@ -176,27 +183,21 @@ class FieldType extends WPObjectType {
 
 									if( !$field['value'] ) return;
 
-									$field['value'] = array_map(function($f){
+									$field['value'] = array_map(function($f) {
+										return \WP_Post::get_instance( $f['ID'] );
+									}, $field['value']);
+
+									return $field['value'];
+								} else {
+									$field = get_field_object( $field['key'], $field['object_id'], true );
+
+									$field['value'] = array_map(function($f) {
 										return \WP_Post::get_instance( $f['ID'] );
 									}, $field['value']);
 
 									return $field['value'];
 								}
-								$field = get_field_object( $field['key'], $field['object_id'], true );
 								return $field['value'];
-							},
-						];
-						break;
-
-					case "relationship":
-					case "relationshipField":
-						$fields['value'] = [
-							'type' => Types::list_of( Types::post_object('post') ),
-							'resolve' => function( array $field ) {
-								if( isset($field['value']) ) {
-									return $field['value'];
-								}
-								return get_field( $field['key'], $field['object_id'], true );
 							},
 						];
 						break;
