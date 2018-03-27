@@ -1,5 +1,5 @@
 {
-  "name": "wp-graphql/wp-graphql-acf",
+  "name": "kyuumeitai/wp-graphql-acf",
   "description": "Advanced Custom Fields bindings for wp-graphql",
   "type": "wordpress-plugin",
   "license": "GPLv3",
@@ -16,7 +16,7 @@
   },
   "autoload": {
     "psr-4": {
-      "WPGraphQL\\Extensions\\ACF\\": "src/"
+      "Kyuumeitai\\Extensions\\ACF\\": "src/"
     },
     "classmap": [
       "src/"
