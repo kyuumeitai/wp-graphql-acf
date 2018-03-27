@@ -21,4 +21,25 @@ class Utils {
 
 	}
 
+	public static function _transform_flexible_layout_value( $value, $layouts ) {
+
+		if( !is_array($value) ) return [];
+
+		foreach($value as $key => $value_layout) {
+			foreach($layouts as $lkey => $layout) {
+				if( $value_layout['acf_fc_layout'] == $layout['name'] ) {
+					foreach( $layout['sub_fields'] as $skey => $sub_field ) {
+						if ( isset($value[$key][$sub_field['name']]) ) {
+							$val = $value[$key][$sub_field['name']];
+							$value[$key][$sub_field['name']] = $sub_field;
+							$value[$key][$sub_field['name']]['value'] = $val;
+						}
+					}
+				}
+			}
+			$value[$key]['graphql_label'] = self::_graphql_label($value[$key]['acf_fc_layout']);
+		}
+		return $value;
+	}
+
 }

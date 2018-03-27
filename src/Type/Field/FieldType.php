@@ -37,6 +37,7 @@ class FieldType extends WPObjectType {
 
 	}
 
+
 	private function fields( $type ) {
 
 		if ( null === self::$fields ) {
@@ -77,13 +78,7 @@ class FieldType extends WPObjectType {
 					'prefix' => [
 						'type' => Types::string(),
 					],
-					'value' => [
-						'type' => Types::string(),
-						'resolve' => function( array $field ) {
-							return get_field( $field['key'], $field['object_id'], true );
-						},
-					],
-//					'order' => [],
+					// 'order' => [],
 					'required' => [
 						'type' => Types::boolean(),
 					],
@@ -103,6 +98,147 @@ class FieldType extends WPObjectType {
 						},
 					],
 				];
+
+				$ftype = isset($type['type']) ? $type['type'] : $type['graphql_label'];
+
+				switch( $ftype ) {
+					case "oembed":
+					case "oembedField":
+						$fields['value'] = [
+							'type' => Types::string(),
+							'args' => [
+								'raw' => [
+									'type' => Types::boolean(),
+									'description' => __( 'Should it return the value raw', 'wp-graphql' ),
+								],
+							],
+							'resolve' => function( array $field, $args ) {
+								if( isset($field['value']) ) {
+									if( isset($args['raw']) && $args['raw'] ) {
+										$field['value'] = strip_tags($field['value']);
+									}
+									return $field['value'];
+								}
+								return get_field( $field['key'], $field['object_id'], true );
+							},
+						];
+						break;
+
+					case "image":
+					case "imageField":
+						$fields['value'] = [
+							'type' => Types::post_object('attachment'),
+							'resolve' => function( array $field ) {
+								if( isset($field['value']) ) {
+									$field = $field['value'];
+								} else {
+									$field = get_field( $field['key'], $field['object_id'], true );
+								}
+								return \WP_Post::get_instance( $field['ID'] );
+							},
+						];
+						break;
+
+					case "flexible_content":
+					case "flexibleContent":
+					case "flexibleContentField":
+						$fields['value'] = [
+							'type' => Types::list_of( ACFTypes::layout_union_type() ),
+							'resolve' => function( array $field ) {
+								if( isset($field['value']) ) {
+									return $field['value'];
+								}
+								$field = get_field_object( $field['key'], $field['object_id'], true );
+								return $field['value'];
+							},
+						];
+						break;
+
+					// case "repeater":
+					// case "repeaterField":
+					// 	$fields['value'] = [
+					// 		'type' => Types::list_of( ACFTypes::repeater_row( $type ) ),
+					// 		'resolve' => function( array $field ) {
+					// 			if( isset($field['value']) ) {
+					// 				return $field['value'];
+					// 			}
+					// 			return get_field( $field['key'], $field['object_id'], true );
+					// 		},
+					// 	];
+					// 	break;
+
+					case "gallery":
+					case "galleryField":
+						$fields['value'] = [
+							'type' => Types::list_of( Types::post_object('attachment') ),
+							'resolve' => function( array $field ) {
+								if( isset($field['value']) ) {
+
+									if( !$field['value'] ) return;
+
+									$field['value'] = array_map(function($f){
+										return \WP_Post::get_instance( $f['ID'] );
+									}, $field['value']);
+
+									return $field['value'];
+								}
+								$field = get_field_object( $field['key'], $field['object_id'], true );
+								return $field['value'];
+							},
+						];
+						break;
+
+					case "relationship":
+					case "relationshipField":
+						$fields['value'] = [
+							'type' => Types::list_of( Types::post_object('post') ),
+							'resolve' => function( array $field ) {
+								if( isset($field['value']) ) {
+									return $field['value'];
+								}
+								return get_field( $field['key'], $field['object_id'], true );
+							},
+						];
+						break;
+
+                    case "file":
+                    case "fileField":
+                        $fields['value'] = [
+                            'type' => Types::post_object('attachment'),
+                            'resolve' => function( array $field ) {
+                                if( isset($field['value']) ) {
+                                    $field = $field['value'];
+                                } else {
+                                    $field = get_field( $field['key'], $field['object_id'], true );
+                                }
+                                return \WP_Post::get_instance( $field['ID'] );
+                            },
+                        ];
+                        break;
+
+                    /**
+					 * Default returns an string or number types, fields that will be returned via the default include all Basic fields:
+					 * - text
+					 * - text area
+					 * - number
+					 * - range
+					 * - email
+					 * - url
+					 * - password
+					 *
+					 * Current issues: 'Field Field' breaks.
+					 */
+					default:
+						$fields['value'] = [
+							'type' => Types::string(),
+							'resolve' => function( array $field ) {
+								if( isset($field['value']) ) {
+									return $field['value'];
+								}
+								return get_field( $field['key'], $field['object_id'], true );
+							},
+						];
+				}
 
 				return self::prepare_fields( $fields, $type['graphql_label'] );
 
