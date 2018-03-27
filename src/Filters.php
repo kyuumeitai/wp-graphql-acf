@@ -83,7 +83,7 @@ class Filters {
 
 		foreach ( $types as $type_key => $type ) {
 
-			$graphql_label                       = ACFUtils::_graphql_label( $type['name'] );
+			$graphql_label                       = ACFUtils::_graphql_label( $type_key );
 			$types[ $type_key ]['graphql_label'] = $graphql_label . 'Field';
 
 		}
