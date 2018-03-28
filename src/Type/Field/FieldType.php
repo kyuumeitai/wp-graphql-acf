@@ -169,7 +169,7 @@ class FieldType extends WPObjectType {
 
 
 					/**
-					 * Gallery feild
+					 * Gallery field
 					 *
 					 * Does an initial check for value, if that isn't set then uses get_field_object to return
 					 * necessary fields
