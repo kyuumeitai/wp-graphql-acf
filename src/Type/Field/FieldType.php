@@ -39,7 +39,7 @@ class FieldType extends WPObjectType {
 
 
 	private function fields( $type ) {
-
+		
 		if ( null === self::$fields ) {
 			self::$fields = [];
 		}
@@ -100,7 +100,7 @@ class FieldType extends WPObjectType {
 				];
 
 				$ftype = isset($type['type']) ? $type['type'] : $type['graphql_label'];
-
+				
 				switch( $ftype ) {
 					case "oembed":
 					case "oembedField":
@@ -227,23 +227,53 @@ class FieldType extends WPObjectType {
 						];
 						break;
 
+						case "taxonomy":
+						case "taxonomyField":
+						$fields['value'] = [
+							'type' => Types::list_of( Types::term_object('category') ),
+							'resolve' => function( array $field ) {
+								// error_log(print_r($field, true));
+								
+								if( isset($field['value']) ) {
+									if( !$field['value'] ) return;
 
-                    case "file":
-                    case "fileField":
-                        $fields['value'] = [
-                            'type' => Types::post_object('attachment'),
-                            'resolve' => function( array $field ) {
-                                if( isset($field['value']) ) {
-                                    $field = $field['value'];
-                                } else {
-                                    $field = get_field( $field['key'], $field['object_id'], true );
-                                }
-                                return \WP_Post::get_instance( $field['ID'] );
-                            },
-                        ];
-                        break;
+									$field['value'] = array_map(function($f) {
+										return \WP_Term::get_instance( $f['ID'], $field['taxonomy'] );
+									}, $field['value']);
 
-                    /**
+								} else {
+									
+									$getTermArr = get_field( $field['key'], $field['object_id'], true );
+
+									// error_log(print_r($getTermArr, true));
+
+									$field['value'] = array_map(function($f) use($field) {
+										return \WP_Term::get_instance( (string) $f, $field['taxonomy']);
+									}, $getTermArr);									
+									return $field['value'];
+
+								}
+							},
+						];
+						break;
+
+
+						case "file":
+						case "fileField":
+							$fields['value'] = [
+									'type' => Types::post_object('attachment'),
+									'resolve' => function( array $field ) {
+											if( isset($field['value']) ) {
+													$field = $field['value'];
+											} else {
+													$field = get_field( $field['key'], $field['object_id'], true );
+											}
+											return \WP_Post::get_instance( $field['ID'] );
+									},
+							];
+							break;
+
+						/**
 					 * Default returns an string or number types, fields that will be returned via the default include all Basic fields:
 					 * - text
 					 * - text area
